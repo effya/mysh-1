@@ -108,6 +108,9 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
 				pid_t pid = getpid();
 				printf("%d\n", pid);
 
+				if(kill(pid, SIGCONT) >=0){
+				waitpid(pid, &status, WUNTRACED);}
+
 				pid_t pid_running = waitpid(pid, &status, WNOHANG);
 
 				if(pid_running == pid){

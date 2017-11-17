@@ -17,4 +17,7 @@ void catch_sigint(int signalNo)
 void catch_sigtstp(int signalNo)
 {
   // TODO: File this!
+
+  signal(SIGTSTP, catch_sigtstp);
+
 }

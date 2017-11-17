@@ -42,8 +42,16 @@ int do_fg(int argc, char** argv) {
 
   if (!validate_fg_argv(argc, argv))
     return -1;
+  pid_t pid = getpid();
+  int status;
 
-  printf("running");
+  if(tcsetpgrp(1, getpgid(pid)) ==0 ){
+
+	kill(pid, SIGCONT);
+	waitpid(pid, &status, WUNTRACED);
+	printf("%d running", pid);
+}
+
   
 /*
   if(argc<2){
