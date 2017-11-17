@@ -2,9 +2,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <grp.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
 
 #include "commands.h"
 #include "built_in.h"
+#include <errno.h>
+
+//export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin;
 
 static struct built_in_command built_in_commands[] = {
   { "cd", do_cd, validate_cd_argv },
@@ -49,11 +61,76 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
       return 0;
     } else if (strcmp(com->argv[0], "exit") == 0) {
       return 1;
-    } else {
+    } 
+
+
+
+//ls implementation
+      else if(strcmp(com->argv[0], "/bin/ls") == 0) {
+
+
+	int status;
+	pid_t child_pid;
+	pid_t parent_pid;
+
+	if(fork() == 0)
+		execv(com->argv[0], com->argv);
+	else
+		wait(&status);
+    }
+
+
+
+//process creation
+     else if(strcmp(com->argv[0], "/bin/cat") == 0){
+
+	int status;
+
+	//etc/hosts is the full path. edit late
+	if(strcmp(com->argv[1], "/etc/hosts")==0){
+
+		if(fork()==0){
+			execv(com->argv[0], com->argv);
+			execv(com->argv[1], com->argv);
+		}
+
+		else
+			wait(&status);
+	
+	}
+
+	else
+	 return 1;
+     }
+
+	else if(strcmp(com->argv[0], "/usr/bin/vim") ==0){
+
+	int status;
+		if(fork()==0)
+			execv(com->argv[0], com->argv);
+	
+		else
+			wait(&status);
+//launch vim
+	}
+
+
+//implement path resolution. ls /, cat /etc/hosts, vim , cd ~
+// export PATH = /usr/local.....
+
+
+
+      else {
       fprintf(stderr, "%s: command not found\n", com->argv[0]);
       return -1;
     }
-  }
+
+//using elsestrcmp(com->argv[0], "ls"
+// ls/bin branch 
+//vim
+
+
+}
 
   return 0;
 }
