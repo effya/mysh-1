@@ -42,6 +42,9 @@ int do_fg(int argc, char** argv) {
 
   if (!validate_fg_argv(argc, argv))
     return -1;
+
+  printf("running");
+  
 /*
   if(argc<2){
 	printf("usage: fg <pid> \n");

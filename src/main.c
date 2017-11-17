@@ -7,12 +7,16 @@
 #include "utils.h"
 #include "signal.h"
 
+#include "signal_handlers.h"
+
+
+
 
 int main()
 {
   char buf[8096];
 
-
+ signal(SIGINT, catch_sigint);
   while (1) {
     fgets(buf, 8096, stdin);
 

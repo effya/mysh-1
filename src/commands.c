@@ -85,27 +85,59 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
      else if(strcmp(com->argv[0], "/bin/cat") == 0){
 
 	int status;
-
+//	int i=0;
+	int dont_wait =0;
+//	int pid = fork();
 	//etc/hosts is the full path. edit late
-	if(strcmp(com->argv[1], "/etc/hosts")==0){
 
 		if(fork()==0){
-			execv(com->argv[0], com->argv);
-			execv(com->argv[1], com->argv);
-		}
+//			execv(com->argv[0], com->argv);
+			int i= 0;		
+			while(com->argv[i] !=NULL) {
+				if(strcmp(com->argv[i], "&")==0){
 
+				dont_wait = 1;
+				com->argv[i] = NULL;
+			}
+			i++;
+			}
+
+//child process and & signal
+			if(dont_wait == 1){
+//				execv(com->argv[0], com->argv);
+				pid_t pid = getpid();
+				printf("%d\n", pid);
+
+				pid_t pid_running = waitpid(pid, &status, WNOHANG);
+
+				if(pid_running == pid){
+					printf("%d done\n", pid);
+					return 1;
+				}
+				else
+					do_fg(com->argc, com->argv);
+				
+				return 1;
+			}
+
+			else
+				execv(com->argv[0], com->argv);
+			
+		//	if(
+		}
+			
+		//	execv(com->argv[0], com->argv);
 		else
 			wait(&status);
-	
-	}
 
-	else
-	 return 1;
+
+//	else
+//	 return 1;
      }
 
 	else if(strcmp(com->argv[0], "/usr/bin/vim") ==0){
 
-	int status;
+		int status;
 		if(fork()==0)
 			execv(com->argv[0], com->argv);
 	
@@ -120,6 +152,27 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
 
 
 
+//background processing
+/*	else if(com->argc>0){
+
+		int i = 0;
+		int dont_wait = 0;
+		while(com->argv[i]!= NULL){
+			if(!strcmp(com->argv[i], "&")){
+				dont_wait = 1;
+				com->argv[i] = NULL;
+			}
+			i++;
+		}
+
+
+		pid_t pid;
+		pid = getpid();
+		printf("%s", pid);
+
+		
+	}
+*/
       else {
       fprintf(stderr, "%s: command not found\n", com->argv[0]);
       return -1;
